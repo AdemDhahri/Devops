@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "ademDh/devopspipline:latest"
+        DOCKER_IMAGE = "ademdh/devopspipline:latest"
         DOCKER_CREDENTIALS = "pipline-example"
     }
 
