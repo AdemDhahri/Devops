@@ -43,6 +43,7 @@ pipeline {
                             try {
                                 // Properly separate commands to avoid shell errors
                                 //br br
+                                //mingo 
                                 sh '''
                                     set -e
                                     export DOCKER_CLIENT_TIMEOUT=300
