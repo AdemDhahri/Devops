@@ -42,6 +42,7 @@ pipeline {
                         for (int i = 1; i <= retries; i++) {
                             try {
                                 // Properly separate commands to avoid shell errors
+                                //br br
                                 sh '''
                                     set -e
                                     export DOCKER_CLIENT_TIMEOUT=300
