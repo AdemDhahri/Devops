@@ -10,6 +10,8 @@ pipeline {
         NEXUS_REGISTRY = "192.168.33.10:8085"
         IMAGE_NAME     = "devops-app"
         IMAGE_TAG      = "${BUILD_NUMBER}"
+        K8S_NAMESPACE = "devops"
+        DOCKER_IMAGE  = "${NEXUS_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
 
         // Jenkins credentials IDs
         NEXUS_CREDENTIALS = "nexus"
@@ -77,7 +79,31 @@ pipeline {
                 }
             }
         }
-    }
+
+        stage('Deploy to Kubernetes') {
+         steps {
+        sh """
+          kubectl get namespace ${K8S_NAMESPACE} \
+            || kubectl create namespace ${K8S_NAMESPACE}
+
+          kubectl apply -f kub/mysql-deployment.yaml -n ${K8S_NAMESPACE}
+          kubectl wait --for=condition=Ready pod -l app=mysql \
+            -n ${K8S_NAMESPACE} --timeout=180s
+
+          kubectl apply -f kub/spring-deployment.yaml -n ${K8S_NAMESPACE}
+
+          kubectl set image deployment/student-app \
+            student-app=${DOCKER_IMAGE} \
+            -n ${K8S_NAMESPACE}
+
+          kubectl rollout status deployment/student-app \
+            -n ${K8S_NAMESPACE} --timeout=300s
+
+          kubectl get pods -n ${K8S_NAMESPACE}
+        """
+             }
+        }
+    }  
 
     post {
         success {
